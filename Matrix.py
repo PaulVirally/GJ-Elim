@@ -61,21 +61,26 @@ class Matrix:
         # pseudo: self.data[row] -= factor * self.data[other_row]
         self.data[row] = [self.data[row][x] - self.data[other_row][x] * factor for x in range(len(self.data[row]))]
 
-    def step(self):
-        # Find the 1s
-        for i in range(len(self.data)):
-            if self.data[i][i] != 1:
-                # Find the 1
-                self.div_row(i, self.data[i][i])
-
+    def solve(self):
         # Get to REF
         for i in range(len(self.data)):
-            if not all([x == 0 for x in self.data[i][:i]]):
-                # Find the next 0
-                return
+            # Do we have a 1?
+            if self.data[i][i] != 1:
+                # Find the next 1
+                self.div_row(i, self.data[i][i])
+                print(self)
 
-        # Get to RREF
-        for i in range(len(self.data)):
-            if not all([x == 0 for x in self.data[i][:i+1]]):
-                # Find the next 0
-                return
+            # Do we have 0s under that 1?
+            below = [self.data[i+x][i] for x in range(1, len(self.data) - i)]
+            # Find the next 0 to place
+            for idx in range(1, len(below)+1):
+                next_row = i + idx
+                if self.data[next_row][i] != 0:
+                    self.sub_rows(next_row, i, self.data[next_row][i])
+                    print(self)
+
+        # # Get to RREF
+        # for i in range(len(self.data)):
+        #     if not all([x == 0 for x in self.data[i][:i+1]]):
+        #         # Find the next 0
+        #         return
