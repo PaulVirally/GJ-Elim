@@ -61,8 +61,7 @@ class Matrix:
         # pseudo: self.data[row] -= factor * self.data[other_row]
         self.data[row] = [self.data[row][x] - self.data[other_row][x] * factor for x in range(len(self.data[row]))]
 
-    def solve(self):
-        # Get to REF
+    def find_ref(self):
         for i in range(len(self.data)):
             # Do we have a 1?
             if self.data[i][i] != 1:
@@ -78,6 +77,11 @@ class Matrix:
                 if self.data[next_row][i] != 0:
                     self.sub_rows(next_row, i, self.data[next_row][i])
                     print(self)
+
+
+    def solve(self):
+        self.find_ref()
+        # Get to REF
 
         # # Get to RREF
         # for i in range(len(self.data)):
