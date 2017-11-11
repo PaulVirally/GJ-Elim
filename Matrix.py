@@ -2,21 +2,39 @@ class Matrix:
 
     def __init__(self, dim, data=[]):
         self.dim = dim
-        self.data = []
+        self.data = data
 
     def fill(self, data):
         self.data = data
 
     def __str__(self):
-        # ┘ └ ┐ ┌ │
-        # ┌            ̩   ┐
-        # │ 1 0 0 0 0 │ 1 │
-        # │ 0 1 0 0 0 │ 2 │
-        # │ 0 0 1 0 0 │ 3 │
-        # │ 0 0 0 1 0 │ 4 │
-        # │ 0 0 0 0 1 │ 5 │
-        # └            ̍   ┘
-        pass
+        # ┛ ┗ ┓ ┏ ┃ │
+        #
+        # ┏            ̩   ┓
+        # ┃ 1 0 0 0 0 │ 1 ┃
+        # ┃ 0 1 0 0 0 │ 2 ┃
+        # ┃ 0 0 1 0 0 │ 3 ┃
+        # ┃ 0 0 0 1 0 │ 4 ┃
+        # ┃ 0 0 0 0 1 │ 5 ┃
+        # ┗            ̍   ┛
+        widths = []
+        for j in range(len(self.data[0])):
+            widths.append(max(len(str(self.data[i][j])) for i in range(len(self.data))) + 1) # +1 For padding
+
+        s = ''
+        for row in self.data:
+            s += '┃ '
+            for i in range(len(row)):
+                s += str(row[i]).center(widths[i])
+                if i == len(row) - 2:
+                    s += '│'
+            s += ' ┃\n'
+        
+        size = max(len(row) for row in s.split('\n')) - 2
+        s =  '┏' + ' '*size + '┓\n' + s
+        s += '┗' + ' '*size + '┛'
+        # s += '┗' + ' '*(size-widths[-1]-2) + '│' + ' '*(widths[-1]+1) + '┛'
+        return s
 
     def get_row(self, n):
         return self.data[n]
