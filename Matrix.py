@@ -1,7 +1,6 @@
 class Matrix:
 
-    def __init__(self, dim, data=[]):
-        self.dim = dim
+    def __init__(self, data=[]):
         self.data = data
 
     def fill(self, data):
@@ -19,13 +18,13 @@ class Matrix:
         # ┗            ̍   ┛
         widths = []
         for j in range(len(self.data[0])):
-            widths.append(max(len(str(self.data[i][j])) for i in range(len(self.data))) + 1) # +1 For padding
+            widths.append(max(len('{:g}'.format(self.data[i][j])) for i in range(len(self.data))) + 2) # +2 For padding
 
         s = ''
         for row in self.data:
             s += '┃ '
             for i in range(len(row)):
-                s += str(row[i]).center(widths[i])
+                s += '{:g}'.format(row[i]).center(widths[i])
                 if i == len(row) - 2:
                     s += '│'
             s += ' ┃\n'
@@ -43,21 +42,40 @@ class Matrix:
         return [x[n] for x in self.data]
 
     def _get_mul_row(self, row, factor):
-        return [self.data[row][x] * factor for x in range(self.dim)]
+        return [self.data[row][x] * factor for x in range(len(self.data[row]))]
 
     def mul_row(self, row, factor):
         self.data[row] = self._get_mul_row(row, factor)
 
     def _get_div_row(self, row, factor):
-        return [self.data[row][x] / factor for x in range(self.dim)]
+        return [self.data[row][x] / factor for x in range(len(self.data[row]))]
 
     def div_row(self, row, factor):
         self.data[row] = self._get_div_row(row, factor)
 
     def add_rows(self, row, other_row, factor):
         # pseudo: self.data[row] += factor * self.data[other_row]
-        self.data[row] = [self.data[row][x] + self.data[other_row][x] * factor for x in range(self.dim)]
+        self.data[row] = [self.data[row][x] + self.data[other_row][x] * factor for x in range(len(self.data[row]))]
 
     def sub_rows(self, row, other_row, factor):
         # pseudo: self.data[row] -= factor * self.data[other_row]
-        self.data[row] = [self.data[row][x] - self.data[other_row][x] * factor for x in range(self.dim)]
+        self.data[row] = [self.data[row][x] - self.data[other_row][x] * factor for x in range(len(self.data[row]))]
+
+    def step(self):
+        # Find the 1s
+        for i in range(len(self.data)):
+            if self.data[i][i] != 1:
+                # Find the 1
+                self.div_row(i, self.data[i][i])
+
+        # Get to REF
+        for i in range(len(self.data)):
+            if not all([x == 0 for x in self.data[i][:i]]):
+                # Find the next 0
+                return
+
+        # Get to RREF
+        for i in range(len(self.data)):
+            if not all([x == 0 for x in self.data[i][:i+1]]):
+                # Find the next 0
+                return
