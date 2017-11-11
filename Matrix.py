@@ -75,16 +75,22 @@ class Matrix:
             for idx in range(1, len(below)+1):
                 next_row = i + idx
                 if self.data[next_row][i] != 0:
+                    # Make the 0
                     self.sub_rows(next_row, i, self.data[next_row][i])
                     print(self)
 
+    def find_rref(self):
+        self.find_ref()
+
+        for i in range(len(self.data)-1, -1, -1):
+            # Do we have 0s above the 1?
+            above = [self.data[i-x][i] for x in range(1, i+1)]
+            for idx in range(1, len(above)+1):
+                previous_row = i - idx
+                if self.data[previous_row][i] != 0:
+                    # Make the 0
+                    self.sub_rows(previous_row, i, self.data[previous_row][i])
+                    print(self)
 
     def solve(self):
-        self.find_ref()
-        # Get to REF
-
-        # # Get to RREF
-        # for i in range(len(self.data)):
-        #     if not all([x == 0 for x in self.data[i][:i+1]]):
-        #         # Find the next 0
-        #         return
+        self.find_rref()
