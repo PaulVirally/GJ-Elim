@@ -1,3 +1,6 @@
+import Utils
+from Utils import Color, to_subscript
+
 class Matrix:
 
     def __init__(self, data=[]):
@@ -61,13 +64,23 @@ class Matrix:
         # pseudo: self.data[row] -= factor * self.data[other_row]
         self.data[row] = [self.data[row][x] - self.data[other_row][x] * factor for x in range(len(self.data[row]))]
 
-    def find_ref(self):
+    def find_ref(self, print_level=1):
+        print_string = ''
         for i in range(len(self.data)):
             # Do we have a 1?
             if self.data[i][i] != 1:
                 # Find the next 1
-                self.div_row(i, self.data[i][i])
-                print(self)
+                factor = self.data[i][i]
+                self.div_row(i, factor)
+
+                # Fancy printing
+                if print_level >= 1:
+                    print_string += str(self)
+                    if print_level >= 2:
+                        print_string += ' R' + Utils.to_subscript(i+1)
+                        print_string += ' → R' + Utils.to_subscript(i+1)
+                        print_string += ' ÷ {:g}'.format(factor)
+                    print_string += '\n'
 
             # Do we have 0s under that 1?
             below = [self.data[i+x][i] for x in range(1, len(self.data) - i)]
@@ -75,22 +88,51 @@ class Matrix:
             for idx in range(1, len(below)+1):
                 next_row = i + idx
                 if self.data[next_row][i] != 0:
+                    factor = self.data[next_row][i]
                     # Make the 0
-                    self.sub_rows(next_row, i, self.data[next_row][i])
-                    print(self)
+                    self.sub_rows(next_row, i, factor)
 
-    def find_rref(self):
-        self.find_ref()
+                    # Fancy printing
+                    if print_level >= 1:
+                        print_string += str(self)
+                        if print_level >= 2:
+                            print_string += ' R' + Utils.to_subscript(next_row+1)
+                            print_string += ' → R' + Utils.to_subscript(next_row+1)
+                            print_string += ' - {0}R'.format((abs(factor) if abs(factor) != 1 else '')) + Utils.to_subscript(i+1)
+                        print_string += '\n'
 
+        print(print_string, end='')
+
+    def find_rref(self, print_level=1):
+        print_string = ''
+        if print_level >= 2:
+            print_string += Color.BOLD + Color.UNDERLINE + 'Finding REF' + Color.END + '\n'
+        print(print_string, end='')
+        print_string = ''
+
+        self.find_ref(print_level=print_level)
+
+        print_string += Color.BOLD + Color.UNDERLINE + 'Finding RREF' + Color.END + '\n'
         for i in range(len(self.data)-1, -1, -1):
             # Do we have 0s above the 1?
             above = [self.data[i-x][i] for x in range(1, i+1)]
             for idx in range(1, len(above)+1):
                 previous_row = i - idx
                 if self.data[previous_row][i] != 0:
+                    factor = self.data[previous_row][i]
                     # Make the 0
-                    self.sub_rows(previous_row, i, self.data[previous_row][i])
-                    print(self)
+                    self.sub_rows(previous_row, i, factor)
 
-    def solve(self):
-        self.find_rref()
+                    # Fancy printing
+                    if print_level >= 1:
+                        print_string += str(self)
+                        if print_level >= 2:
+                            print_string += ' R' + Utils.to_subscript(previous_row+1)
+                            print_string += ' → R' + Utils.to_subscript(previous_row+1)
+                            print_string += ' - {0}R'.format(('{:g}'.format(abs(factor)) if abs(factor) != 1 else '')) + Utils.to_subscript(i+1)
+                        print_string += '\n'
+
+        print(print_string, end='')
+
+    def solve(self, print_level=1):
+        self.find_rref(print_level=print_level)
